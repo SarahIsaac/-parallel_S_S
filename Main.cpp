@@ -3,6 +3,7 @@
 #include <atomic>
 #include <mutex>
 #include <cmath>
+#include <algorithm>
 
 #include <time.h>
 #include "Timer.h"
