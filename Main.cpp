@@ -115,7 +115,7 @@ bool linearSearch(std::vector<int>elements, int search_value, int start, int end
 
 bool runlinearSearch(TaskQueue &queue, int search_val, std::vector<int> randomNumbers, int j)
 {
-	std::atomic<bool> element_found = false;
+	std::atomic<bool> element_found(0);
 	int start;
 	int end = 0;
 	for (int i = 0; i < j; i++)
