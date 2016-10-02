@@ -166,20 +166,20 @@ int main()
 	std::vector<double> standard_sort_times;
 	std::vector<double> standard_search_times;
 
-	////STANDARD quick sort
-	//for (int i = 0; i < 5; i++)
-	//{
-	//	double time = functionTimer([&]() {std::sort(standard_test_numbers[i].begin(), standard_test_numbers[i].end()); });
-	//	standard_sort_times.push_back(time);
-	//}
+	//STANDARD quick sort
+	for (int i = 0; i < 5; i++)
+	{
+		double time = functionTimer([&]() {std::sort(standard_test_numbers[i].begin(), standard_test_numbers[i].end()); });
+		standard_sort_times.push_back(time);
+	}
 
-	//////STANDARD linear search
-	//for (int i = 0; i < 5; i++)
-	//{
-	//	int find_value = rand() % 200 + 1;
-	//	double time = functionTimer([=]() {std::find(standard_test_numbers[i].begin(), standard_test_numbers[i].end(), find_value); });
-	//	standard_search_times.push_back(time);
-	//}
+	////STANDARD linear search
+	for (int i = 0; i < 5; i++)
+	{
+		int find_value = rand() % 200 + 1;
+		double time = functionTimer([=]() {std::find(standard_test_numbers[i].begin(), standard_test_numbers[i].end(), find_value); });
+		standard_search_times.push_back(time);
+	}
 
 	double standard_sort = getAverage(standard_sort_times);
 	double standard_dev_sort = getStdDev(standard_sort, standard_sort_times);
