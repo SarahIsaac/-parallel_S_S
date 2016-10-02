@@ -162,41 +162,6 @@ int main()
 {
 	srand(time(NULL));
 
-	std::vector<std::vector<int>> standard_test_numbers = getRandomVector(200);
-
-	std::vector<double> standard_sort_times;
-	std::vector<double> standard_search_times;
-
-	//STANDARD quick sort
-	for (int i = 0; i < 5; i++)
-	{
-		double time = functionTimer([&]() {std::sort(standard_test_numbers[i].begin(), standard_test_numbers[i].end()); });
-		standard_sort_times.push_back(time);
-	}
-
-	////STANDARD linear search
-	for (int i = 0; i < 5; i++)
-	{
-		int find_value = rand() % 200 + 1;
-		double time = functionTimer([=]() {std::find(standard_test_numbers[i].begin(), standard_test_numbers[i].end(), find_value); });
-		standard_search_times.push_back(time);
-	}
-
-	double standard_sort = getAverage(standard_sort_times);
-	double standard_dev_sort = getStdDev(standard_sort, standard_sort_times);
-	std::cout << "STANDARD SORT" << std::endl;
-	std::cout << "Average SEARCH time: " << standard_sort << std::endl;
-	std::cout << "Standard Deviation: " << standard_dev_sort << std::endl;
-	std::cout << std::endl;
-
-	double standard_search = getAverage(standard_search_times);
-	double standard_dev_search = getStdDev(standard_search, standard_search_times);
-	std::cout << "STANDARD SEARCH" << std::endl;
-	std::cout << "Average SORT time: " << standard_search << std::endl;
-	std::cout << "Standard Deviation: " << standard_dev_search << std::endl;
-	std::cout << std::endl;
-
-
 	for (int j = 2; j <= 8; j++)
 	{
 		std::vector<double> sort_times;
@@ -241,6 +206,42 @@ int main()
 		std::cout << "Standard Deviation: " << search_std_dev << std::endl;
 		std::cout << std::endl;
 	}
+
+	std::cout << "--------------------------------------" << std::endl;
+
+	std::vector<std::vector<int>> standard_test_numbers = getRandomVector(200);
+
+	std::vector<double> standard_sort_times;
+	std::vector<double> standard_search_times;
+
+	//STANDARD quick sort
+	for (int i = 0; i < 5; i++)
+	{
+		double time = functionTimer([&]() {std::sort(standard_test_numbers[i].begin(), standard_test_numbers[i].end()); });
+		standard_sort_times.push_back(time);
+	}
+
+	////STANDARD linear search
+	for (int i = 0; i < 5; i++)
+	{
+		int find_value = rand() % 200 + 1;
+		double time = functionTimer([=]() {std::find(standard_test_numbers[i].begin(), standard_test_numbers[i].end(), find_value); });
+		standard_search_times.push_back(time);
+	}
+
+	double standard_sort = getAverage(standard_sort_times);
+	double standard_dev_sort = getStdDev(standard_sort, standard_sort_times);
+	std::cout << "STANDARD SORT" << std::endl;
+	std::cout << "Average SEARCH time: " << standard_sort << std::endl;
+	std::cout << "Standard Deviation: " << standard_dev_sort << std::endl;
+	std::cout << std::endl;
+
+	double standard_search = getAverage(standard_search_times);
+	double standard_dev_search = getStdDev(standard_search, standard_search_times);
+	std::cout << "STANDARD SEARCH" << std::endl;
+	std::cout << "Average SORT time: " << standard_search << std::endl;
+	std::cout << "Standard Deviation: " << standard_dev_search << std::endl;
+	std::cout << std::endl;
 
 	return 0;
 }
