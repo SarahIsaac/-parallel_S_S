@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <atomic>
+#include <mutex>
+
 #include <time.h>
 #include "Timer.h"
 #include "TaskQueue.h"
@@ -9,6 +12,30 @@ Write a parallel version of quicksort and linear search.  Run with 2-8 threads i
 Use std::sort and std::find as your serial algorithm to compare with for speedup.
 Search and sort vectors of 100 to 1,000,000 elements (use a log scale).  Include a report of timing, speedup, and efficiency.
 */
+
+double getAverage(std::vector<double> times)
+{
+	int size = times.size();
+	double total = 0;
+	for (int i = 0; i < times.size(); i++)
+	{
+		total += times[i];
+	}
+	double average = total / size;
+	return average;
+}
+
+double getStdDev(double average, std::vector<double> times)
+{
+	double size = times.size();
+	double sum = 0;
+	for (double i = 0; i < times.size(); i++)
+	{
+		sum += ((times[i] - average) * (times[i] - average));
+	}
+	sum = sqrt(sum / size);
+	return sum;
+}
 
 int get_median(std::vector<int>elements, int first, int second, int third)
 {
@@ -76,31 +103,52 @@ void quickSort(std::vector<int> &elements, int start, int end, TaskQueue &queue)
 	return;
 }
 
-bool linearSearch(std::vector<int>elements, int search_value, int start, int end, TaskQueue &q)
+bool linearSearch(std::vector<int>elements, int search_value, int start, int end, TaskQueue &queue, std::atomic<bool> &element_found)
 {
 	int increment = start;
-	while (increment < end)
+	while (increment < end && element_found == false)
 	{
 		if (elements[increment] == search_value)
 		{
-			//std::cout << "TRUE" << std::endl;
+			element_found = true;
 			return true;
 		}
 		else increment++;
 	}
-	//std::cout << "FALSE" << std::endl;
 	return false;
 }
 
-std::vector<int> getRandomVector(int element_count)
+void runlinearSearch(TaskQueue &queue, int search_val, std::vector<int> randomNumbers, int j)
+{
+	std::atomic<bool> element_found = false;
+	int start;
+	int end = 0;
+	for (int i = 0; i < j; i++)
+	{
+		start = end;
+		end = (randomNumbers.size() * (i + 1)) / j;
+		queue.add_task([=, &queue, &element_found]() {linearSearch(randomNumbers, search_val, start, end, queue, element_found); });
+		end++;
+	}
+
+	if (element_found) std::cout << "found: " << search_val << std::endl;
+}
+
+std::vector<std::vector<int>> getRandomVector(int element_count)
 {
 	srand(time(NULL));
-	std::vector<int> numbers;
-	for (int i = 0; i < element_count; i++)
+	std::vector<std::vector<int>> number_vectors;
+	for (int j = 0; j < 6; j++)
 	{
-		numbers.push_back(rand() % 20 + 1);
+		std::vector<int> numbers;
+		for (int i = 0; i < element_count; i++)
+		{
+			numbers.push_back(rand() % 200 + 1);
+		}
+		number_vectors.push_back(numbers);
+
 	}
-	return  numbers;
+	return  number_vectors;
 }
 
 void print_vector(std::vector<int> numbers)
@@ -115,38 +163,84 @@ int main()
 {
 	srand(time(NULL));
 
+	std::vector<std::vector<int>> standard_test_numbers = getRandomVector(200);
+	std::vector<double> standard_sort_times;
+	std::vector<double> standard_search_times;
+
+
+	//STANDARD quick sort
+	for (int i = 0; i < 5; i++)
+	{
+		double time = functionTimer([&]() {std::sort(standard_test_numbers[i].begin(), standard_test_numbers[i].end()); });
+		standard_sort_times.push_back(time);
+	}
+
+	////STANDARD linear search
+	for (int i = 0; i < 5; i++)
+	{
+		int find_value = rand() % 200 + 1;
+		double time = functionTimer([=]() {std::find(standard_test_numbers[i].begin(), standard_test_numbers[i].end(), find_value); });
+		standard_search_times.push_back(time);
+	}
+
+	double standard_sort = getAverage(standard_sort_times);
+	double standard_dev_sort = getStdDev(standard_sort, standard_sort_times);
+	std::cout << "STANDARD SORT" << std::endl;
+	std::cout << "Average SEARCH time: " << standard_sort << std::endl;
+	std::cout << "Standard Deviation: " << standard_dev_sort << std::endl;
+	std::cout << std::endl;
+
+	double standard_search = getAverage(standard_search_times);
+	double standard_dev_search = getStdDev(standard_search, standard_search_times);
+	std::cout << "STANDARD SEARCH" << std::endl;
+	std::cout << "Average SORT time: " << standard_search << std::endl;
+	std::cout << "Standard Deviation: " << standard_dev_search << std::endl;
+	std::cout << std::endl;
+
+
 	for (int j = 2; j <= 8; j++)
 	{
-		std::vector<int> randomNumbers = getRandomVector(20);
+		std::vector<double> sort_times;
+		std::vector<double> search_times;
+
+		std::vector<std::vector<int>> randomNumbers = getRandomVector(200);
 		TaskQueue queue(j);
+
+		//print out results of sort one time
+		if (j == 2)
+		{
+			quickSort(randomNumbers[5], 0, randomNumbers[5].size() - 1, queue);
+			print_vector(randomNumbers[5]);
+		}
+
+		//quick sort
 		for (int i = 0; i < 5; i++)
 		{
-			//select a partition of the vector
-			quickSort(randomNumbers, 0, randomNumbers.size() - 1, queue);
-			//print_vector(randomNumbers);
-			std::cout << i;
+			double time = functionTimer([=, &queue, &randomNumbers]() {quickSort(randomNumbers[i], 0, randomNumbers[i].size() - 1, queue); });
+			sort_times.push_back(time);
 		}
-		std::cout << std::endl;
 
-
+		//linear search
 		for (int i = 0; i < 5; i++)
 		{
-			int find_value = rand() % 20 + 1;
-			//select a partion of the vector
-			int start;
-			int end = 0;
-			for (int i = 0; i < j; i++)
-			{
-				start = end;
-				end = (randomNumbers.size() * (i + 1)) / j;
-				queue.add_task([=, &queue]() {linearSearch(randomNumbers, find_value, start, end, queue); });
-				end++;
-			}
-			std::cout << i;
+			int find_value = rand() % 200 + 1;
+			double time = functionTimer([=, &queue, &randomNumbers]() {runlinearSearch(queue, find_value, randomNumbers[i], j); });
+			search_times.push_back(time);
 		}
+
+		double sort_average = getAverage(sort_times);
+		double sort_std_dev = getStdDev(sort_average, sort_times);
+		std::cout << "THREADED WITH " << j << " THREADS" << std::endl;
+		std::cout << "Average SEARCH time: " << sort_average << std::endl;
+		std::cout << "Standard Deviation: " << sort_std_dev << std::endl;
 		std::cout << std::endl;
 
-
+		double search_average = getAverage(search_times);
+		double search_std_dev = getStdDev(search_average, search_times);
+		std::cout << "THREADED WITH " << j << " THREADS" << std::endl;
+		std::cout << "Average SORT time: " << sort_average << std::endl;
+		std::cout << "Standard Deviation: " << sort_std_dev << std::endl;
+		std::cout << std::endl;
 	}
 
 	return 0;

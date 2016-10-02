@@ -14,8 +14,6 @@ private:
 	std::atomic<bool> continue_on;
 	std::vector<std::thread> pool;
 	std::condition_variable taskAdded;
-	//std::condition_variable taskAdded;
-	std::condition_variable itemFound;
 	std::vector<std::thread> thread_pool;
 
 public:
