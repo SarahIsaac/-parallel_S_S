@@ -118,7 +118,7 @@ bool linearSearch(std::vector<int>elements, int search_value, int start, int end
 	return false;
 }
 
-void runlinearSearch(TaskQueue &queue, int search_val, std::vector<int> randomNumbers, int j)
+bool runlinearSearch(TaskQueue &queue, int search_val, std::vector<int> randomNumbers, int j)
 {
 	std::atomic<bool> element_found = false;
 	int start;
@@ -131,7 +131,8 @@ void runlinearSearch(TaskQueue &queue, int search_val, std::vector<int> randomNu
 		end++;
 	}
 
-	if (element_found) std::cout << "found: " << search_val << std::endl;
+	//if (element_found) std::cout << "found: " << search_val << std::endl;
+	return element_found;
 }
 
 std::vector<std::vector<int>> getRandomVector(int element_count)
@@ -153,10 +154,12 @@ std::vector<std::vector<int>> getRandomVector(int element_count)
 
 void print_vector(std::vector<int> numbers)
 {
+	std::cout << std::endl;
 	for (int i = 0; i < numbers.size(); i++)
 	{
 		std::cout << numbers[i] << std::endl;
 	}
+	std::cout << std::endl;
 }
 
 int main()
@@ -164,9 +167,9 @@ int main()
 	srand(time(NULL));
 
 	std::vector<std::vector<int>> standard_test_numbers = getRandomVector(200);
+
 	std::vector<double> standard_sort_times;
 	std::vector<double> standard_search_times;
-
 
 	//STANDARD quick sort
 	for (int i = 0; i < 5; i++)
@@ -224,7 +227,7 @@ int main()
 		for (int i = 0; i < 5; i++)
 		{
 			int find_value = rand() % 200 + 1;
-			double time = functionTimer([=, &queue, &randomNumbers]() {runlinearSearch(queue, find_value, randomNumbers[i], j); });
+			double time = functionTimer([=, &queue, &randomNumbers]() {if (runlinearSearch(queue, find_value, randomNumbers[i], j)) std::cout << "found: " << find_value << std::endl; });
 			search_times.push_back(time);
 		}
 
