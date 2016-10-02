@@ -236,8 +236,8 @@ int main()
 		double search_average = getAverage(search_times);
 		double search_std_dev = getStdDev(search_average, search_times);
 		std::cout << "THREADED WITH " << j << " THREADS" << std::endl;
-		std::cout << "Average SORT time: " << sort_average << std::endl;
-		std::cout << "Standard Deviation: " << sort_std_dev << std::endl;
+		std::cout << "Average SORT time: " << search_average << std::endl;
+		std::cout << "Standard Deviation: " << search_std_dev << std::endl;
 		std::cout << std::endl;
 	}
 
