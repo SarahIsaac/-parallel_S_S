@@ -2,16 +2,11 @@
 #include <vector>
 #include <atomic>
 #include <mutex>
+#include <cmath>
 
 #include <time.h>
 #include "Timer.h"
 #include "TaskQueue.h"
-
-/*
-Write a parallel version of quicksort and linear search.  Run with 2-8 threads in the thread pool.
-Use std::sort and std::find as your serial algorithm to compare with for speedup.
-Search and sort vectors of 100 to 1,000,000 elements (use a log scale).  Include a report of timing, speedup, and efficiency.
-*/
 
 double getAverage(std::vector<double> times)
 {
@@ -171,20 +166,20 @@ int main()
 	std::vector<double> standard_sort_times;
 	std::vector<double> standard_search_times;
 
-	//STANDARD quick sort
-	for (int i = 0; i < 5; i++)
-	{
-		double time = functionTimer([&]() {std::sort(standard_test_numbers[i].begin(), standard_test_numbers[i].end()); });
-		standard_sort_times.push_back(time);
-	}
+	////STANDARD quick sort
+	//for (int i = 0; i < 5; i++)
+	//{
+	//	double time = functionTimer([&]() {std::sort(standard_test_numbers[i].begin(), standard_test_numbers[i].end()); });
+	//	standard_sort_times.push_back(time);
+	//}
 
-	////STANDARD linear search
-	for (int i = 0; i < 5; i++)
-	{
-		int find_value = rand() % 200 + 1;
-		double time = functionTimer([=]() {std::find(standard_test_numbers[i].begin(), standard_test_numbers[i].end(), find_value); });
-		standard_search_times.push_back(time);
-	}
+	//////STANDARD linear search
+	//for (int i = 0; i < 5; i++)
+	//{
+	//	int find_value = rand() % 200 + 1;
+	//	double time = functionTimer([=]() {std::find(standard_test_numbers[i].begin(), standard_test_numbers[i].end(), find_value); });
+	//	standard_search_times.push_back(time);
+	//}
 
 	double standard_sort = getAverage(standard_sort_times);
 	double standard_dev_sort = getStdDev(standard_sort, standard_sort_times);
